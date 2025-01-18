@@ -3,6 +3,7 @@ package com.flipfit.flipfit.service;
 import com.flipfit.flipfit.exception.CenterAlreadyExistsException;
 import com.flipfit.flipfit.exception.WorkoutTypeAlreadyPresentException;
 import com.flipfit.flipfit.model.Center;
+import com.flipfit.flipfit.model.Slot;
 import com.flipfit.flipfit.model.WorkoutVariations;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -28,5 +29,12 @@ public class CenterService {
             throw new WorkoutTypeAlreadyPresentException("Workout type already exists");
         }
         workoutVariations.add(workoutVariation);
+    }
+
+    public List<WorkoutVariations> getWorkoutVariationsForAGivenCenter(Center center) {
+        return center.getSlots().stream()
+                .map(Slot::getVariation)
+                .distinct()
+                .toList();
     }
 }
