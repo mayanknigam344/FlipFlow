@@ -15,6 +15,6 @@ public class Slot {
     Time startTime;
     List<WorkoutVariations> workoutVariationsInSlot;
     List<Seat> seatList;
-    boolean isPremiumSlot;
     List<User> users;
+    SlotType slotType;
 }

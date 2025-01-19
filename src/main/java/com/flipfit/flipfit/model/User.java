@@ -11,4 +11,5 @@ public class User {
     Long userId;
     String userName;
     List<MyBooking> bookings;
+    UserType userType;
 }
