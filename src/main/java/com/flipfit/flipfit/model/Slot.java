@@ -13,7 +13,7 @@ public class Slot {
     Long slotId;
     Date slotDate;
     Time startTime;
-    WorkoutVariations variation;
+    List<WorkoutVariations> workoutVariationsInSlot;
     List<Seat> seatList;
     boolean isPremiumSlot;
     List<User> users;
