@@ -13,7 +13,7 @@ public class Slot {
     Long slotId;
     Date slotDate;
     Time startTime;
-    List<WorkoutVariations> workoutVariationsInSlot;
+    List<WorkoutVariation> workoutVariationInSlot;
     int seatCount;
     List<User> users;
     SlotType slotType;

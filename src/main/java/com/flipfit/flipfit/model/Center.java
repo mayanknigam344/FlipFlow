@@ -13,5 +13,5 @@ public class Center {
     String city;
     Location location;
     List<Slot> slots;
-    List<WorkoutVariations> workoutVariationsInCenter;
+    List<WorkoutVariation> workoutVariationInCenter;
 }

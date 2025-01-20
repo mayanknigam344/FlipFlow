@@ -1,6 +1,6 @@
 package com.flipfit.flipfit.model;
 
-public enum WorkoutVariations {
+public enum WorkoutVariation {
     WEIGHTS,
     CARDIO,
     YOGA,

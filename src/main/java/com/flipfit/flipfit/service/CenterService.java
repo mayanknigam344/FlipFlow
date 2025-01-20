@@ -21,15 +21,15 @@ public class CenterService {
         log.info("Added center {}", center.getCenterId());
         return center;
     }
-    public void addWorkoutTypeInCenter(Center center, WorkoutVariations workoutVariation) {
-        List<WorkoutVariations> workoutVariations = center.getWorkoutVariationsInCenter();
+    public void addWorkoutTypeInCenter(Center center, WorkoutVariation workoutVariation) {
+        List<WorkoutVariation> workoutVariations = center.getWorkoutVariationInCenter();
         if(workoutVariations.contains(workoutVariation)) {
             throw new WorkoutTypeAlreadyPresentException("Workout type already exists");
         }
         workoutVariations.add(workoutVariation);
     }
 
-    public List<WorkoutVariations> getWorkoutVariationsForAGivenCenter(Center center) {
-        return center.getWorkoutVariationsInCenter();
+    public List<WorkoutVariation> getWorkoutVariationsForAGivenCenter(Center center) {
+        return center.getWorkoutVariationInCenter();
     }
 }
