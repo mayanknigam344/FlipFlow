@@ -2,8 +2,7 @@ package com.flipfit.flipfit.service;
 
 import com.flipfit.flipfit.exception.CenterAlreadyExistsException;
 import com.flipfit.flipfit.exception.WorkoutTypeAlreadyPresentException;
-import com.flipfit.flipfit.model.Center;
-import com.flipfit.flipfit.model.WorkoutVariations;
+import com.flipfit.flipfit.model.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

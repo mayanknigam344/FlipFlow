@@ -14,7 +14,8 @@ public class Slot {
     Date slotDate;
     Time startTime;
     List<WorkoutVariations> workoutVariationsInSlot;
-    List<Seat> seatList;
+    int seatCount;
     List<User> users;
     SlotType slotType;
+    boolean isAvailable;
 }
