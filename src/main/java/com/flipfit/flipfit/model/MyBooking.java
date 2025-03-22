@@ -7,6 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
+//TODO: Do we need this class.? Think
 public class MyBooking {
     Slot slot;
     Center center;
