@@ -1,16 +1,12 @@
 package com.flipfit.flipfit.service;
 
 import com.flipfit.flipfit.exception.UserAlreadyPresentException;
-import com.flipfit.flipfit.model.Center;
-import com.flipfit.flipfit.model.slot.Slot;
 import com.flipfit.flipfit.model.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -26,10 +22,5 @@ public class UserService {
         users.add(user);
         log.info("Added user:{}", user.getUserId());
         return user;
-    }
-
-    public Map<Slot,Boolean> viewAllSlotsForAGivenCenterAndUser(Center center, Date date, User user){
-       // TODO: Needs Rework
-        return null;
     }
 }
