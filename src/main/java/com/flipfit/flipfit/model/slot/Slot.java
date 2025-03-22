@@ -14,6 +14,6 @@ public abstract class Slot {
     Long slotId;
     Date slotDate;
     Time startTime;
-    List<WorkoutVariation> workoutVariationInSlot;
+    WorkoutVariation workoutVariation;
     SlotType slotType;
 }
