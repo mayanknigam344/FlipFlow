@@ -1,7 +1,7 @@
 package com.flipfit.flipfit.service;
 
 import com.flipfit.flipfit.exception.WorkoutTypeAlreadyPresentException;
-import com.flipfit.flipfit.model.Slot;
+import com.flipfit.flipfit.model.slot.Slot;
 import com.flipfit.flipfit.model.WorkoutVariation;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,6 @@
 package com.flipfit.flipfit.controller;
 
-import com.flipfit.flipfit.model.Slot;
+import com.flipfit.flipfit.model.slot.Slot;
 import com.flipfit.flipfit.model.WorkoutVariation;
 import com.flipfit.flipfit.service.SlotService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,5 +1,7 @@
 package com.flipfit.flipfit.model;
 
+import com.flipfit.flipfit.model.slot.Slot;
+import com.flipfit.flipfit.model.user.User;
 import lombok.Getter;
 import lombok.Setter;
 

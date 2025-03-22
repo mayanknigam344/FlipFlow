@@ -1,5 +1,6 @@
-package com.flipfit.flipfit.model;
+package com.flipfit.flipfit.model.slot;
 
+import com.flipfit.flipfit.model.WorkoutVariation;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,13 +10,10 @@ import java.util.List;
 
 @Getter
 @Setter
-public class Slot {
+public abstract class Slot {
     Long slotId;
     Date slotDate;
     Time startTime;
     List<WorkoutVariation> workoutVariationInSlot;
-    int seatCount;
-    List<User> users;
     SlotType slotType;
-    boolean isAvailable;
 }
