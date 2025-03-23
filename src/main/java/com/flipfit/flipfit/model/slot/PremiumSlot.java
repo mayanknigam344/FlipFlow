@@ -6,16 +6,15 @@ import lombok.Setter;
 
 import java.sql.Date;
 import java.sql.Time;
-import java.util.List;
 
 @Getter
 @Setter
 public class PremiumSlot extends Slot {
-    public PremiumSlot(Long slotId, Date slotDate, Time startTime, List<WorkoutVariation> workoutVariationInASlot) {
+    public PremiumSlot(Long slotId, Date slotDate, Time startTime, WorkoutVariation workoutVariation) {
         this.slotId = slotId;
         this.slotDate = slotDate;
         this.startTime = startTime;
-        this.workoutVariationInASlot = workoutVariationInASlot;
+        this.workoutVariation = workoutVariation;
         this.slotType = SlotType.PREMIUM_SLOT;
     }
 }

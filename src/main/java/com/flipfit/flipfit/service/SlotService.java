@@ -1,9 +1,10 @@
 package com.flipfit.flipfit.service;
 
-import com.flipfit.flipfit.exception.WorkoutTypeAlreadyPresentException;
 import com.flipfit.flipfit.model.Center;
-import com.flipfit.flipfit.model.WorkoutVariation;
 import com.flipfit.flipfit.model.slot.Slot;
+import com.flipfit.flipfit.model.slot.SlotType;
+import com.flipfit.flipfit.model.user.User;
+import com.flipfit.flipfit.model.user.UserType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,12 +31,23 @@ public class SlotService {
         slots.add(slot);
     }
 
-    public void addWorkoutTypeInSlot(Slot slot, WorkoutVariation workoutVariation) {
-        List<WorkoutVariation> workoutVariations = slot.getWorkoutVariationInASlot();
-        if(workoutVariations.contains(workoutVariation)) {
-            throw new WorkoutTypeAlreadyPresentException("Workout type already exists");
+    public List<Slot> viewSlotsForACenterAndGivenDate(Center center, Date date, User user) {
+        if(user.getUserType().equals(UserType.FK_VIP_USER))
+            return viewAllPremiumSlotsForAGivenDateAndGivenCenter(center, date);
+        else
+            return viewNormalSlotsForAGivenDateAndGivenCenter(center, date);
+    }
+
+    public List<Slot> viewNormalSlotsForAGivenDateAndGivenCenter(Center center, Date date){
+        List<Slot> allSlots = viewAllSlotsForAGivenCenterAndAGivenDate(center, date);
+        List<Slot> premiumSlots = viewAllPremiumSlotsForAGivenDateAndGivenCenter(center, date);
+        List<Slot> normalSlots = new ArrayList<>();
+        for(Slot slot : allSlots) {
+            if(!premiumSlots.contains(slot)){
+                normalSlots.add(slot);
+            }
         }
-        workoutVariations.add(workoutVariation);
+        return normalSlots;
     }
 
     public List<Slot> viewAllSlotsForAGivenCenterAndAGivenDate(Center center, Date date){
@@ -43,6 +55,16 @@ public class SlotService {
             return List.of();
         return slotsInACenter.get(center)
                 .stream()
+                .filter(slot -> slot.getSlotDate().equals(date))
+                .toList();
+    }
+
+    public List<Slot> viewAllPremiumSlotsForAGivenDateAndGivenCenter(Center center, Date date){
+        if(center.getSlots().isEmpty())
+            return List.of();
+        return slotsInACenter.get(center)
+                .stream()
+                .filter(slot -> slot.getSlotType().equals(SlotType.PREMIUM_SLOT))
                 .filter(slot -> slot.getSlotDate().equals(date))
                 .toList();
     }

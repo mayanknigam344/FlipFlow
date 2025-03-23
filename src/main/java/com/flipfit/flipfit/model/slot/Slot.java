@@ -6,7 +6,6 @@ import lombok.Setter;
 
 import java.sql.Date;
 import java.sql.Time;
-import java.util.List;
 
 @Getter
 @Setter
@@ -14,6 +13,6 @@ public abstract class Slot {
     Long slotId;
     Date slotDate;
     Time startTime;
-    List<WorkoutVariation> workoutVariationInASlot;
+    WorkoutVariation workoutVariation;
     SlotType slotType;
 }
