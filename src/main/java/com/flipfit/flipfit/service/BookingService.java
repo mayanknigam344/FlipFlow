@@ -14,5 +14,6 @@ public class BookingService {
 
     public void book(User user, Center center, WorkoutVariation workoutVariation, Slot slot) {
         //TODO: Implement this
+
     }
 }

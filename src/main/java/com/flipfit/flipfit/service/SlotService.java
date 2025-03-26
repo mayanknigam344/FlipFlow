@@ -1,6 +1,7 @@
 package com.flipfit.flipfit.service;
 
 import com.flipfit.flipfit.model.Center;
+import com.flipfit.flipfit.model.WorkoutVariation;
 import com.flipfit.flipfit.model.slot.Slot;
 import com.flipfit.flipfit.model.slot.SlotType;
 import com.flipfit.flipfit.model.user.User;
@@ -13,6 +14,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -29,6 +31,20 @@ public class SlotService {
         slotsInACenter.putIfAbsent(center,new ArrayList<>());
         slotsInACenter.get(center).add(slot);
         slots.add(slot);
+    }
+
+    public void addWorkoutVariationInASlot(Slot slot, WorkoutVariation workoutVariation, int seats){
+       Map<WorkoutVariation,Integer> hmap = slot.getWorkoutVariationVsSeatCount();
+       if(hmap.containsKey(workoutVariation)){
+           hmap.put(workoutVariation,hmap.get(workoutVariation)+seats);
+       }
+       else {
+           hmap.put(workoutVariation, seats);
+       }
+    }
+
+    public int getSeatCountInaSlotForaWorkoutVariation(Slot slot, WorkoutVariation workoutVariation){
+        return slot.getWorkoutVariationVsSeatCount().get(workoutVariation);
     }
 
     public List<Slot> viewSlotsForACenterAndGivenDate(Center center, Date date, User user) {
