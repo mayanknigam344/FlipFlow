@@ -21,16 +21,19 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SlotService {
 
-    private final List<Slot> slots;
-    HashMap<Center,List<Slot>> slotsInACenter;
+    // String - CenterId;
+    HashMap<String,List<Slot>> slotsInACenter;
 
     public void addSlotInCenter(Slot slot, Center center) {
         List<Slot> slotsInCenter = center.getSlots();
         slotsInCenter.add(slot);
         log.info("Slot added for center {} , slot {}",center.getCenterId(),slot.getSlotId());
-        slotsInACenter.putIfAbsent(center,new ArrayList<>());
-        slotsInACenter.get(center).add(slot);
-        slots.add(slot);
+        slotsInACenter.putIfAbsent(center.getCenterId(),new ArrayList<>());
+        slotsInACenter.get(center.getCenterId()).add(slot);
+    }
+
+    public List<Slot> getAllSlots(Center center){
+        return slotsInACenter.get(center.getCenterId());
     }
 
     public void addWorkoutVariationInASlot(Slot slot, WorkoutVariation workoutVariation, int seats){

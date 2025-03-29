@@ -11,7 +11,7 @@ import java.util.Map;
 @Getter
 @Setter
 public abstract class Slot {
-    Long slotId;
+    String slotId;
     Date slotDate;
     Time startTime;
     Map<WorkoutVariation,Integer> workoutVariationVsSeatCount;
