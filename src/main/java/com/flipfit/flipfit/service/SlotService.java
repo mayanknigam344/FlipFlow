@@ -47,7 +47,7 @@ public class SlotService {
         return slot.getWorkoutVariationVsSeatCount().get(workoutVariation);
     }
 
-    public List<Slot> viewSlotsForACenterAndGivenDate(Center center, Date date, User user) {
+    public List<Slot> getSlotsForACenterAndGivenDate(Center center,User user,Date date) {
         if(user.getUserType().equals(UserType.FK_VIP_USER))
             return viewAllPremiumSlotsForAGivenDateAndGivenCenter(center, date);
         else

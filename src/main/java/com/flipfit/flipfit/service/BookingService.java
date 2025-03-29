@@ -5,7 +5,6 @@ import com.flipfit.flipfit.model.Booking;
 import com.flipfit.flipfit.model.Center;
 import com.flipfit.flipfit.model.WorkoutVariation;
 import com.flipfit.flipfit.model.slot.Slot;
-import com.flipfit.flipfit.model.slot.SlotType;
 import com.flipfit.flipfit.model.user.User;
 import com.flipfit.flipfit.model.user.UserType;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +46,7 @@ public class BookingService {
 
         // User is allowed, so get all the slots for a given center for a given date
         // If user is VIP User then it will see only premium slots
-        List<Slot> slotsInACenterForAGivenDate = getSlots(user, center, date);
+        List<Slot> slotsInACenterForAGivenDate = slotService.getSlotsForACenterAndGivenDate(center,user,date);
 
         //check if that slot exists or not.
         if(slotsInACenterForAGivenDate.contains(slot)){
@@ -72,21 +71,6 @@ public class BookingService {
             }
         }
         return booking;
-    }
-
-    private List<Slot> getSlots(User user , Center center, Date date) {
-        List<Slot> slotsInACenterForAGivenDate = center.getSlots()
-                .stream().filter(slotInAGivenDate -> slotInAGivenDate.getSlotDate().equals(date))
-                .toList();
-        if(user.getUserType().equals(UserType.FK_VIP_USER)){
-            return slotsInACenterForAGivenDate.stream().filter(
-                    slot -> slot.getSlotType().equals(SlotType.PREMIUM_SLOT))
-                    .toList();
-        }else{
-            return slotsInACenterForAGivenDate.stream().filter(
-                            slot -> slot.getSlotType().equals(SlotType.NORMAL_SLOT))
-                    .toList();
-        }
     }
 
     private String generateUserId() {
