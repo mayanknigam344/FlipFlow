@@ -9,12 +9,13 @@ import com.flipfit.flipfit.service.BookingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 
+import java.sql.Date;
+
 @Controller
 public class BookingController {
     @Autowired BookingService bookingService;
 
-    public Booking book(User user, Center center, Slot slot , WorkoutVariation workoutVariation){
-        return bookingService.book(user,center,workoutVariation,slot);
+    public Booking book(User user, Center center, Slot slot , WorkoutVariation workoutVariation, Date date){
+        return bookingService.book(user,center,workoutVariation,slot,date);
     }
-
 }

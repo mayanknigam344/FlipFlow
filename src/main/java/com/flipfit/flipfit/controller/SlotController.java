@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
 public class SlotController {
 
     @Autowired SlotService slotService;
-    public void addWorkoutVariationsForASlot(Slot slot, WorkoutVariation workoutVariation){
-        slotService.addWorkoutTypeInSlot(slot,workoutVariation);
+    public void addWorkoutVariationsForASlot(Slot slot, WorkoutVariation workoutVariation, int seats){
+        slotService.addWorkoutVariationInASlot(slot,workoutVariation,seats);
     }
 }

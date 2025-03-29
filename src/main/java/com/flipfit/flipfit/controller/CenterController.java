@@ -18,6 +18,6 @@ public class CenterController {
     }
 
     public List<WorkoutVariation> getWorkoutVariationsForAGivenCenter(Center center){
-        return centerService.getWorkoutVariationsForAGivenCenter(center);
+     return centerService.getWorkoutVariationsForAGivenCenter(center);
     }
 }
