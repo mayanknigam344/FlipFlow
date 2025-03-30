@@ -1,16 +1,17 @@
 package com.flipfit.flipfit.controller;
 
 import com.flipfit.flipfit.model.Center;
-import com.flipfit.flipfit.model.slot.Slot;
 import com.flipfit.flipfit.model.WorkoutVariation;
+import com.flipfit.flipfit.model.slot.Slot;
 import com.flipfit.flipfit.service.SlotService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 
 @Controller
+@RequiredArgsConstructor
 public class SlotController {
 
-    @Autowired SlotService slotService;
+    private final SlotService slotService;
 
     public void addSlotInACenter(Slot slot , Center center){
         slotService.addSlotInCenter(slot, center);

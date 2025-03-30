@@ -6,13 +6,13 @@ import com.flipfit.flipfit.model.slot.Slot;
 import com.flipfit.flipfit.model.slot.SlotType;
 import com.flipfit.flipfit.model.user.User;
 import com.flipfit.flipfit.model.user.UserType;
+import com.flipfit.flipfit.repository.CenterRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,19 +21,14 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class SlotService {
 
-    // String - CenterId;
-    HashMap<String,List<Slot>> slotsInACenter;
+    private final CenterRepository centerRepository;
 
-    public void addSlotInCenter(Slot slot, Center center) {
-        List<Slot> slotsInCenter = center.getSlots();
-        slotsInCenter.add(slot);
-        log.info("Slot added for center {} , slot {}",center.getCenterId(),slot.getSlotId());
-        slotsInACenter.putIfAbsent(center.getCenterId(),new ArrayList<>());
-        slotsInACenter.get(center.getCenterId()).add(slot);
+    public void addSlotInCenter(Slot slot , Center center){
+        centerRepository.addSlotInCenter(slot,center);
     }
 
-    public List<Slot> getAllSlots(Center center){
-        return slotsInACenter.get(center.getCenterId());
+    public List<Slot> getAllSlotsForACenter(Center center){
+        return centerRepository.getSlotsInCenter(center);
     }
 
     public void addWorkoutVariationInASlot(Slot slot, WorkoutVariation workoutVariation, int seats){
@@ -72,7 +67,7 @@ public class SlotService {
     public List<Slot> viewAllSlotsForAGivenCenterAndAGivenDate(Center center, Date date){
         if(center.getSlots().isEmpty())
             return List.of();
-        return slotsInACenter.get(center)
+        return centerRepository.getSlotsInCenter(center)
                 .stream()
                 .filter(slot -> slot.getSlotDate().equals(date))
                 .toList();
@@ -81,7 +76,7 @@ public class SlotService {
     public List<Slot> viewAllPremiumSlotsForAGivenDateAndGivenCenter(Center center, Date date){
         if(center.getSlots().isEmpty())
             return List.of();
-        return slotsInACenter.get(center)
+        return centerRepository.getSlotsInCenter(center)
                 .stream()
                 .filter(slot -> slot.getSlotType().equals(SlotType.PREMIUM_SLOT))
                 .filter(slot -> slot.getSlotDate().equals(date))

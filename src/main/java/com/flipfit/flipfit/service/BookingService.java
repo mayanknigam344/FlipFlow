@@ -7,37 +7,37 @@ import com.flipfit.flipfit.model.WorkoutVariation;
 import com.flipfit.flipfit.model.slot.Slot;
 import com.flipfit.flipfit.model.user.User;
 import com.flipfit.flipfit.model.user.UserType;
+import com.flipfit.flipfit.repository.BookingRepository;
+import com.flipfit.flipfit.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Date;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 //TODO : Need to refactor this code
 public class BookingService {
 
-    @Autowired SlotService slotService;
+    private final  SlotService slotService;
+    private final BookingRepository bookingRepository;
+    private final UserRepository userRepository;
 
-    HashMap<String,List<Booking>> bookings = new HashMap<>();
     List<Booking> premiumBookingQueue = new ArrayList<>();
     List<Booking> normalBookingQueue = new ArrayList<>();
 
     public Booking book(User user, Center center, WorkoutVariation workoutVariation, Slot slot, Date date) {
-        bookings.computeIfAbsent(user.getUserId(), k -> new ArrayList<>());
         Booking booking=null;
 
         // check if user is allowed to do booking or not.
-        List<Booking> bookingListForAGivenDate = bookings.get(user.getUserId()).stream()
-                .filter(bookingInDate -> bookingInDate.getBookingDate().equals(date))
-                .toList();
-        List<Booking> bookingPerCenter = bookingListForAGivenDate.stream()
-                .filter(bookingInCenter -> bookingInCenter.getCenter().equals(center))
+        List<Booking> bookingListForAUserInADay= userRepository.getAllBookingsForUserInADay(user,date);
+        List<Booking> bookingPerCenter = bookingListForAUserInADay.stream()
+                .filter(bookingInCenter -> bookingInCenter.getCenter().getCenterId().equals(center.getCenterId()))
                 .toList();
 
         if(bookingPerCenter.size()>3){
@@ -58,7 +58,8 @@ public class BookingService {
                 slot.getWorkoutVariationVsSeatCount().put(workoutVariation, seatsForWorkoutVariation-1);
                 String bookingId = generateUserId();
                 booking.setBookingId(bookingId);
-                bookings.get(user.getUserId()).add(booking);
+                bookingRepository.addBooking(booking);
+                userRepository.addBookingForUser(user,booking);
                 log.info("Booking is Successful with booking id {} for user {} and added in the bookingList",bookingId,user.getUserId());
             }else{
                 // otherwise add the booking in list(based on user type).

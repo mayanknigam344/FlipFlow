@@ -17,15 +17,15 @@ public class CenterService {
 
     private final CenterRepository centerRepository;
 
-    public Center addCenter(Center center){
-         return centerRepository.addCenter(center);
+    public void addCenter(Center center){
+         centerRepository.addCenter(center);
     }
 
     public List<WorkoutVariation> getWorkoutVariationsForAGivenCenter(Center center){
-        return center.getSlots()
+        return centerRepository.getSlotsInCenter(center)
                 .stream()
                 .map(Slot::getWorkoutVariationVsSeatCount)
-                .flatMap(workoutVariationIntegerMap -> workoutVariationIntegerMap.keySet().stream())
+                .flatMap(map -> map.keySet().stream())
                 .distinct()
                 .toList();
     }
