@@ -15,4 +15,8 @@ public class BookingRepository {
     public void addBooking(Booking booking){
         bookings.add(booking);
     }
+
+    public void removeBooking(Booking booking){
+        bookings.remove(booking);
+    }
 }

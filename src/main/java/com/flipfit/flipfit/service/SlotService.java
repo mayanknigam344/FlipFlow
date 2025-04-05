@@ -9,10 +9,12 @@ import com.flipfit.flipfit.model.user.UserType;
 import com.flipfit.flipfit.repository.CenterRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
+import java.sql.Time;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -41,20 +43,25 @@ public class SlotService {
        }
     }
 
-    public int getSeatCountInaSlotForaWorkoutVariation(Slot slot, WorkoutVariation workoutVariation){
+    public int getSeatCountInaSlotForAWorkoutVariation(Slot slot, WorkoutVariation workoutVariation){
         return slot.getWorkoutVariationVsSeatCount().get(workoutVariation);
     }
 
-    public List<Slot> getSlotsForACenterAndGivenDate(Center center,User user,Date date) {
-        if(user.getUserType().equals(UserType.FK_VIP_USER))
-            return viewAllPremiumSlotsForAGivenDateAndGivenCenter(center, date);
-        else
-            return viewNormalSlotsForAGivenDateAndGivenCenter(center, date);
+    public void incrementSeatCountInCaseOfCancel(Slot slot, WorkoutVariation workoutVariation){
+        Map<WorkoutVariation, Integer> seatMap = slot.getWorkoutVariationVsSeatCount();
+        seatMap.merge(workoutVariation, 1, Integer::sum);
     }
 
-    public List<Slot> viewNormalSlotsForAGivenDateAndGivenCenter(Center center, Date date){
-        List<Slot> allSlots = viewAllSlotsForAGivenCenterAndAGivenDate(center, date);
-        List<Slot> premiumSlots = viewAllPremiumSlotsForAGivenDateAndGivenCenter(center, date);
+    public List<Slot> getSlotsForACenterAndGivenDateAndTime(Center center, User user, Date date, Time time) {
+        if(user.getUserType().equals(UserType.FK_VIP_USER))
+            return viewAllPremiumSlotsForAGivenDateAndTimeAndGivenCenter(center, date,time);
+        else
+            return viewNormalSlotsForAGivenDateAndTimeAndGivenCenter(center, date,time);
+    }
+
+    public List<Slot> viewNormalSlotsForAGivenDateAndTimeAndGivenCenter(Center center, Date date, Time time){
+        List<Slot> allSlots = viewAllSlotsForAGivenCenterAndAGivenDateAndTime(center, date,time);
+        List<Slot> premiumSlots = viewAllPremiumSlotsForAGivenDateAndTimeAndGivenCenter(center, date,time);
         List<Slot> normalSlots = new ArrayList<>();
         for(Slot slot : allSlots) {
             if(!premiumSlots.contains(slot)){
@@ -64,22 +71,24 @@ public class SlotService {
         return normalSlots;
     }
 
-    public List<Slot> viewAllSlotsForAGivenCenterAndAGivenDate(Center center, Date date){
+    public List<Slot> viewAllSlotsForAGivenCenterAndAGivenDateAndTime(Center center, Date date, Time time){
         if(center.getSlots().isEmpty())
             return List.of();
         return centerRepository.getSlotsInCenter(center)
                 .stream()
-                .filter(slot -> slot.getSlotDate().equals(date))
+                .filter(slot -> DateUtils.isSameDay(slot.getSlotDate(),date))
+                .filter(slot -> slot.getStartTime().toLocalTime().equals(time.toLocalTime()))
                 .toList();
     }
 
-    public List<Slot> viewAllPremiumSlotsForAGivenDateAndGivenCenter(Center center, Date date){
+    public List<Slot> viewAllPremiumSlotsForAGivenDateAndTimeAndGivenCenter(Center center, Date date, Time time){
         if(center.getSlots().isEmpty())
             return List.of();
         return centerRepository.getSlotsInCenter(center)
                 .stream()
                 .filter(slot -> slot.getSlotType().equals(SlotType.PREMIUM_SLOT))
-                .filter(slot -> slot.getSlotDate().equals(date))
+                .filter(slot -> DateUtils.isSameDay(slot.getSlotDate(),date))
+                .filter(slot -> slot.getStartTime().toLocalTime().equals(time.toLocalTime()))
                 .toList();
     }
 }

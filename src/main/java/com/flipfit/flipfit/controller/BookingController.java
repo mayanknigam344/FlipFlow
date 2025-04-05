@@ -7,17 +7,18 @@ import com.flipfit.flipfit.model.slot.Slot;
 import com.flipfit.flipfit.model.user.User;
 import com.flipfit.flipfit.service.BookingService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-
-import java.sql.Date;
 
 @Controller
 @RequiredArgsConstructor
 public class BookingController {
     private final BookingService bookingService;
 
-    public Booking book(User user, Center center, Slot slot , WorkoutVariation workoutVariation, Date date){
-        return bookingService.book(user,center,workoutVariation,slot,date);
+    public Booking book(User user, Center center, Slot slot , WorkoutVariation workoutVariation){
+        return bookingService.book(user,center,workoutVariation,slot);
+    }
+
+    public void cancel(User user, Center center, Slot slot){
+         bookingService.cancelBooking(user,center,slot);
     }
 }

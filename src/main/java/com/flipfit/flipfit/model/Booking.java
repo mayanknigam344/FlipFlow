@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Date;
+import java.util.Date;
 
 
 @Setter
@@ -17,5 +17,8 @@ public class Booking {
     private Date bookingDate;
     private Center center;
     private Slot slot;
+    private WorkoutVariation workoutVariation;
     private User user;
+    // 0 for Normal 1 for VIP
+    private int priority;
 }
