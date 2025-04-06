@@ -11,7 +11,7 @@ import java.util.Date;
 
 @Setter
 @Getter
-@Builder
+@Builder(toBuilder = true)
 public class Booking {
     private String bookingId;
     private Date bookingDate;
