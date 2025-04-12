@@ -20,4 +20,17 @@ public class Booking {
     private User user;
     // 0 for Normal 1 for VIP
     private int priority;
+
+    @Override
+    public String toString() {
+        return "Booking{" +
+                "bookingId='" + bookingId + '\'' +
+                ", bookingDateTime=" + bookingDateTime +
+                ", center=" + center +
+                ", slot=" + slot +
+                ", workoutVariation=" + workoutVariation +
+                ", user=" + user +
+                ", priority=" + priority +
+                '}';
+    }
 }

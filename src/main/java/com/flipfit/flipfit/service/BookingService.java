@@ -78,7 +78,7 @@ public class BookingService {
         }else{
             // otherwise add the booking in list(based on user type).
             bookingQueue.add(booking);
-            log.info("Added in the waiting queue");
+            log.info("Added the booking in the waiting queue. Booking details - {}",booking);
         }
         log.info("Booking flow completed");
         return booking;
@@ -99,7 +99,7 @@ public class BookingService {
                 return;
             }
             Booking notBooked = bookingQueue.poll();
-            log.info("Fetching the booking{} and priority {} from waiting queue",notBooked,booking.get().getPriority());
+            log.info("Fetching the booking{} and priority {} from waiting queue", notBooked,booking.get().getPriority());
             book(notBooked.getUser(),notBooked.getCenter(),notBooked.getWorkoutVariation(),notBooked.getSlot());
         }
     }
