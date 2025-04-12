@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 
 @Setter
@@ -14,7 +14,7 @@ import java.util.Date;
 @Builder(toBuilder = true)
 public class Booking {
     private String bookingId;
-    private Date bookingDate;
+    private LocalDate bookingDate;
     private Center center;
     private Slot slot;
     private WorkoutVariation workoutVariation;

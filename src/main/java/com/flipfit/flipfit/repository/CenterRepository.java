@@ -29,6 +29,7 @@ public class CenterRepository {
     }
 
     public void addSlotInCenter(Slot slot, Center center) {
+        log.info("Adding slot {} in center {}", slot, center.getCenterId());
         slotsInCenter.computeIfAbsent(center.getCenterId(),k->new ArrayList<>());
         slotsInCenter.get(center.getCenterId()).add(slot);
     }

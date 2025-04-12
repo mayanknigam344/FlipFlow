@@ -7,10 +7,13 @@ import com.flipfit.flipfit.model.Center;
 import com.flipfit.flipfit.model.slot.Slot;
 import com.flipfit.flipfit.model.user.User;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 @Slf4j
@@ -38,16 +41,16 @@ public class UserRepository {
         List<Booking> bookings = getAllBookingsForUser(user);
         return bookings.stream()
                 .filter(booking -> booking.getCenter().equals(center))
-                .filter(booking-> DateUtils.isSameDay(booking.getBookingDate(),slot.getSlotDate()))
+                .filter(booking-> booking.getBookingDate().equals(slot.getSlotDate()))
                 .filter(booking -> booking.getSlot().getSlotId().equals(slot.getSlotId()))
                 .findFirst();
 
     }
 
-    public List<Booking> getAllBookingsForUserInADay(User user, Date date){
+    public List<Booking> getAllBookingsForUserInADay(User user, LocalDate date){
         List<Booking> bookings = getAllBookingsForUser(user);
         return bookings.stream()
-                .filter(booking -> DateUtils.isSameDay(booking.getBookingDate(),date))
+                .filter(booking -> booking.getBookingDate().equals(date))
                 .toList();
     }
 
