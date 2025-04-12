@@ -1,13 +1,11 @@
 package com.flipfit.flipfit.model.slot;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 public class NormalSlot extends Slot {
-    public NormalSlot(String slotId, LocalDate slotDate, LocalTime startTime) {
+    public NormalSlot(String slotId, LocalDateTime slotDateAndTime) {
         this.slotId = slotId;
-        this.slotDate = slotDate;
-        this.startTime = startTime;
+        this.slotDateAndTime = slotDateAndTime;
         this.slotType = SlotType.NORMAL_SLOT;
     }
 }

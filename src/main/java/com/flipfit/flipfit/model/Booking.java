@@ -6,15 +6,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
-
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
 @Builder(toBuilder = true)
 public class Booking {
     private String bookingId;
-    private LocalDate bookingDate;
+    private LocalDateTime bookingDateTime;
     private Center center;
     private Slot slot;
     private WorkoutVariation workoutVariation;

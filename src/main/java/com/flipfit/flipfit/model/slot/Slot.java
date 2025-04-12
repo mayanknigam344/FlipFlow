@@ -4,16 +4,14 @@ import com.flipfit.flipfit.model.WorkoutVariation;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.Map;
 
 @Getter
 @Setter
 public abstract class Slot {
     String slotId;
-    LocalDate slotDate;
-    LocalTime startTime;
+    LocalDateTime slotDateAndTime;
     // Integer - NumberOfSeats
     Map<WorkoutVariation,Integer> workoutVariationVsSeatCount;
     SlotType slotType;
@@ -22,8 +20,7 @@ public abstract class Slot {
     public String toString() {
         return "Slot{" +
                 "slotId='" + slotId + '\'' +
-                ", slotDate=" + slotDate +
-                ", startTime=" + startTime +
+                ", slotDataAndTime=" + slotDateAndTime +
                 ", workoutVariationVsSeatCount=" + workoutVariationVsSeatCount +
                 '}';
     }

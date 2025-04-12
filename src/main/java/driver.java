@@ -7,8 +7,7 @@ import com.flipfit.flipfit.repository.CenterRepository;
 import com.flipfit.flipfit.service.CenterService;
 import com.flipfit.flipfit.service.SlotService;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 
 public class driver {
 
@@ -23,13 +22,13 @@ public class driver {
 
         //create slots
         // April 12, 2025
-        LocalDate date = LocalDate.of(2025, 4, 12);
-        LocalTime time = LocalTime.of(9, 0);
-        LocalTime time2= LocalTime.of(10,0);
 
-        Slot slot1 = new PremiumSlot("slot-1", date,time);
-        Slot slot2 = new NormalSlot("slot-2",date,time);
-        Slot slot3 = new NormalSlot("slot-3",date,time2);
+        LocalDateTime  dateTime1 = LocalDateTime.of(2025,4,15,9,0);
+        LocalDateTime  dateTime2 = LocalDateTime.of(2025,4,15,10,0);
+
+        Slot slot1 = new PremiumSlot("slot-1",dateTime1);
+        Slot slot2 = new NormalSlot("slot-2",dateTime1);
+        Slot slot3 = new NormalSlot("slot-3",dateTime2);
 
 
         // Adding workout variation in each slot
@@ -54,7 +53,5 @@ public class driver {
         slotService.addSlotInCenter(slot1,center1);
         slotService.addSlotInCenter(slot2,center1);
         slotService.addSlotInCenter(slot3,center1);
-
-
     }
 }

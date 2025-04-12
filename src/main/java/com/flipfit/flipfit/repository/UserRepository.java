@@ -9,7 +9,7 @@ import com.flipfit.flipfit.model.user.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,16 +41,15 @@ public class UserRepository {
         List<Booking> bookings = getAllBookingsForUser(user);
         return bookings.stream()
                 .filter(booking -> booking.getCenter().equals(center))
-                .filter(booking-> booking.getBookingDate().equals(slot.getSlotDate()))
                 .filter(booking -> booking.getSlot().getSlotId().equals(slot.getSlotId()))
+                .filter(booking-> booking.getSlot().getSlotDateAndTime().equals(slot.getSlotDateAndTime()))
                 .findFirst();
-
     }
 
-    public List<Booking> getAllBookingsForUserInADay(User user, LocalDate date){
+    public List<Booking> getAllBookingsForUserInADay(User user, LocalDateTime dateTime){
         List<Booking> bookings = getAllBookingsForUser(user);
         return bookings.stream()
-                .filter(booking -> booking.getBookingDate().equals(date))
+                .filter(booking -> booking.getBookingDateTime().toLocalDate().equals(dateTime.toLocalDate()))
                 .toList();
     }
 

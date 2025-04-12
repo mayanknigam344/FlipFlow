@@ -11,8 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,28 +48,27 @@ public class SlotService {
         seatMap.merge(workoutVariation, 1, Integer::sum);
     }
 
-    public List<Slot> getSlotsForACenterAndGivenDateAndTime(Center center, User user, LocalDate date, LocalTime time) {
+    public List<Slot> getSlotsForACenterAndGivenDateAndTime(Center center, User user, LocalDateTime dateTime) {
         // for premium users - show both types of slots. i.e premium slots and normal slots
         if(user.getUserType().equals(UserType.FK_VIP_USER))
-            return viewAllSlotsForAGivenCenterAndAGivenDateAndTime(center, date,time);
+            return viewAllSlotsForAGivenCenterAndAGivenDateAndTime(center,dateTime);
         else
-            return viewNormalSlotsForAGivenDateAndTimeAndGivenCenter(center, date,time);
+            return viewNormalSlotsForAGivenDateAndTimeAndGivenCenter(center,dateTime);
     }
 
-    public List<Slot> viewNormalSlotsForAGivenDateAndTimeAndGivenCenter(Center center, LocalDate date, LocalTime time){
-        List<Slot> allSlots = viewAllSlotsForAGivenCenterAndAGivenDateAndTime(center, date,time);
+    public List<Slot> viewNormalSlotsForAGivenDateAndTimeAndGivenCenter(Center center, LocalDateTime dateTime){
+        List<Slot> allSlots = viewAllSlotsForAGivenCenterAndAGivenDateAndTime(center,dateTime);
         return allSlots.stream()
                 .filter(slot -> slot.getSlotType().equals(SlotType.NORMAL_SLOT))
                 .toList();
     }
 
-    public List<Slot> viewAllSlotsForAGivenCenterAndAGivenDateAndTime(Center center, LocalDate date, LocalTime time){
+    public List<Slot> viewAllSlotsForAGivenCenterAndAGivenDateAndTime(Center center, LocalDateTime dateTime){
         if(center.getSlots().isEmpty())
             return List.of();
         return centerRepository.getSlotsInCenter(center)
                 .stream()
-                .filter(slot -> slot.getSlotDate().equals(date))
-                .filter(slot -> slot.getStartTime().equals(time))
+                .filter(slot -> slot.getSlotDateAndTime().equals(dateTime))
                 .toList();
     }
 }
