@@ -8,7 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 @Repository
@@ -16,9 +15,6 @@ import java.util.List;
 @Getter
 public class CenterRepository {
     List<Center> centers= new ArrayList<>();
-
-    //String - CenterId
-    HashMap<String, List<Slot>> slotsInCenter = new HashMap<>();
 
     public void addCenter(Center center) {
         if(centers.contains(center)) {
@@ -30,11 +26,10 @@ public class CenterRepository {
 
     public void addSlotInCenter(Slot slot, Center center) {
         log.info("Adding slot {} in center {}", slot, center.getCenterId());
-        slotsInCenter.computeIfAbsent(center.getCenterId(),k->new ArrayList<>());
-        slotsInCenter.get(center.getCenterId()).add(slot);
+        center.getSlots().add(slot);
     }
 
     public List<Slot> getSlotsInCenter(Center center){
-        return slotsInCenter.get(center.getCenterId());
+        return center.getSlots();
     }
 }

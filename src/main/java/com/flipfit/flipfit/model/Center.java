@@ -4,6 +4,7 @@ import com.flipfit.flipfit.model.slot.Slot;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -19,5 +20,17 @@ public class Center {
         this.centerId = centerId;
         this.name = name;
         this.city = city;
+        this.slots = new ArrayList<>();
+    }
+
+    @Override
+    public String toString() {
+        return "Center{" +
+                "centerId='" + centerId + '\'' +
+                ", name='" + name + '\'' +
+                ", city='" + city + '\'' +
+                ", location=" + location +
+                ", slots=" + slots +
+                '}';
     }
 }

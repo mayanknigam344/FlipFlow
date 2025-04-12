@@ -24,7 +24,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BookingService {
 
-    private final  SlotService slotService;
+    private final SlotService slotService;
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
 
@@ -90,7 +90,7 @@ public class BookingService {
         if(booking.isPresent()){
             //removing the booking from bookings and user lists
             bookingRepository.removeBooking(booking.get().getBookingId());
-            userRepository.removeBooking(booking.get());
+            userRepository.removeBooking(user, booking.get());
 
             // increment seat in case of cancel
             slotService.incrementSeatCountInCaseOfCancel(booking.get().getSlot(),booking.get().getWorkoutVariation());

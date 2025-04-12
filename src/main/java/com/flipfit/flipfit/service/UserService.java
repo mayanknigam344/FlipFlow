@@ -21,7 +21,7 @@ public class UserService {
     }
 
     public List<Booking> getAllBookingsForAUser(User user){
-        return userRepository.getAllBookingsForUser(user);
+        return user.getBookings();
     }
 
 }

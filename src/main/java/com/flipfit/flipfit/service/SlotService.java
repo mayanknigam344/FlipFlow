@@ -12,7 +12,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,14 +26,7 @@ public class SlotService {
         centerRepository.addSlotInCenter(slot,center);
     }
 
-    public List<Slot> getAllSlotsForACenter(Center center){
-        return centerRepository.getSlotsInCenter(center);
-    }
-
     public void addWorkoutVariationInASlot(Slot slot, WorkoutVariation workoutVariation, int seats){
-        if (slot.getWorkoutVariationVsSeatCount() == null) {
-            slot.setWorkoutVariationVsSeatCount(new HashMap<>());
-        }
         Map<WorkoutVariation, Integer> hmap = slot.getWorkoutVariationVsSeatCount();
         hmap.put(workoutVariation,hmap.getOrDefault(workoutVariation,0)+seats);
     }
@@ -64,9 +56,7 @@ public class SlotService {
     }
 
     public List<Slot> viewAllSlotsForAGivenCenterAndAGivenDateAndTime(Center center, LocalDateTime dateTime){
-        if(center.getSlots().isEmpty())
-            return List.of();
-        return centerRepository.getSlotsInCenter(center)
+        return  center.getSlots()
                 .stream()
                 .filter(slot -> slot.getSlotDateAndTime().equals(dateTime))
                 .toList();
