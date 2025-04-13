@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,13 +18,13 @@ import java.util.Optional;
 @Slf4j
 public class UserRepository {
 
-     List<User> users = new ArrayList<>();
+     HashMap<String, User> users = new HashMap<>();
 
     public User addUser(User user) {
-        if(users.contains(user)) {
+        if(users.containsKey(user.getUserId())) {
             throw new UserAlreadyPresentException("User already present");
         }
-        users.add(user);
+        users.put(user.getUserId(),user);
         log.info("Added user:{}", user.getUserId());
         return user;
     }
@@ -43,7 +43,8 @@ public class UserRepository {
                 .findFirst();
     }
 
-    public List<Booking> getAllBookingsForUserInADay(User user, LocalDateTime dateTime){
+    public List<Booking> getAllBookingsForUserInADay(String userId, LocalDateTime dateTime){
+        User user = users.get(userId);
         return user.getBookings()
                 .stream()
                 .filter(booking -> booking.getBookingDateTime().toLocalDate().equals(dateTime.toLocalDate()))

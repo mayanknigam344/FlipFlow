@@ -32,7 +32,7 @@ public class SlotService {
     }
 
     public int getSeatCountInaSlotForAWorkoutVariation(Slot slot, WorkoutVariation workoutVariation){
-        return slot.getWorkoutVariationVsSeatCount().get(workoutVariation);
+        return slot.getWorkoutVariationVsSeatCount().getOrDefault(workoutVariation,0);
     }
 
     public void incrementSeatCountInCaseOfCancel(Slot slot, WorkoutVariation workoutVariation){

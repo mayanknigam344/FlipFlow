@@ -22,7 +22,7 @@ public class CenterService {
     }
 
     public List<WorkoutVariation> getWorkoutVariationsForAGivenCenter(Center center){
-        return centerRepository.getSlotsInCenter(center)
+        return center.getSlots()
                 .stream()
                 .map(Slot::getWorkoutVariationVsSeatCount)
                 .flatMap(map -> map.keySet().stream())

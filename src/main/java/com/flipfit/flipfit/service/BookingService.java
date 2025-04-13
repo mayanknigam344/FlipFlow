@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.PriorityQueue;
@@ -38,13 +39,13 @@ public class BookingService {
 
         // check if user is allowed to do booking or not.
         log.info("Validating if user with user id{} is allowed to do booking or not",user.getUserId());
-        List<Booking> bookingListForAUserInADay= userRepository.getAllBookingsForUserInADay(user,slot.getSlotDateAndTime());
+        List<Booking> bookingListForAUserInADay= userRepository.getAllBookingsForUserInADay(user.getUserId(),slot.getSlotDateAndTime());
         List<Booking> bookingPerCenter = bookingListForAUserInADay.stream()
                 .filter(bookingInCenter -> bookingInCenter.getCenter().getCenterId().equals(center.getCenterId()))
                 .toList();
 
-        if(bookingPerCenter.size()>3){
-            throw new UserBookingMaxLimitReachedForAGivenCenter("User already have 3 bookings in a given center");
+        if(bookingPerCenter.size()>=3){
+            throw new UserBookingMaxLimitReachedForAGivenCenter("User is not allowed to do more than 3 bookings for a given center {}"+  user.getUserId());
         }
         log.info("Validated the user bookings. Great!! User is allowed to do booking.");
 
@@ -64,13 +65,13 @@ public class BookingService {
 
         // make a booking object, setting bookingID only when booking is successful.
         // Priority - 1 for VIP, 0 for Normal
-        booking = Booking.builder().bookingDateTime(slot.getSlotDateAndTime()).center(center).slot(slot).priority(user.getUserType().equals(UserType.FK_VIP_USER) ? 1 : 0).build();
+        booking = Booking.builder().bookingDateTime(slot.getSlotDateAndTime()).center(center).workoutVariation(workoutVariation).slot(slot).user(user).priority(user.getUserType().equals(UserType.FK_VIP_USER) ? 1 : 0).build();
         if(seatsForWorkoutVariation>0){
             // Updating the seat count for a given workout variation and slot.
             slot.getWorkoutVariationVsSeatCount().put(workoutVariation, seatsForWorkoutVariation-1);
 
             String bookingId = generateUserId();
-            booking = booking.toBuilder().workoutVariation(workoutVariation).bookingId(bookingId).build();
+            booking = booking.toBuilder().bookingId(bookingId).build();
 
             bookingRepository.addBooking(booking);
             userRepository.addBookingForUser(user,booking);
@@ -94,17 +95,22 @@ public class BookingService {
 
             // increment seat in case of cancel
             slotService.incrementSeatCountInCaseOfCancel(booking.get().getSlot(),booking.get().getWorkoutVariation());
+
             if(bookingQueue.isEmpty()){
                 log.info("Cancel flow completed, also there are no bookings in waiting queue");
                 return;
             }
             Booking notBooked = bookingQueue.poll();
-            log.info("Fetching the booking{} and priority {} from waiting queue", notBooked,booking.get().getPriority());
+            log.info("Fetching the booking {} and priority {} from waiting queue", notBooked,booking.get().getPriority());
             book(notBooked.getUser(),notBooked.getCenter(),notBooked.getWorkoutVariation(),notBooked.getSlot());
         }
     }
 
     private String generateUserId() {
         return UUID.randomUUID().toString();
+    }
+
+    public List<Booking> viewUserBooking(String userId, LocalDateTime date){
+        return userRepository.getAllBookingsForUserInADay(userId,date);
     }
 }
