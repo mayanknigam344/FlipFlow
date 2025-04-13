@@ -1,11 +1,22 @@
-import com.flipfit.flipfit.model.*;
-import com.flipfit.flipfit.model.slot.*;
-import com.flipfit.flipfit.model.user.*;
-import com.flipfit.flipfit.repository.*;
-import com.flipfit.flipfit.service.*;
+import com.flipfit.flipfit.model.Booking;
+import com.flipfit.flipfit.model.Center;
+import com.flipfit.flipfit.model.WorkoutVariation;
+import com.flipfit.flipfit.model.slot.NormalSlot;
+import com.flipfit.flipfit.model.slot.PremiumSlot;
+import com.flipfit.flipfit.model.slot.Slot;
+import com.flipfit.flipfit.model.user.NormalUser;
+import com.flipfit.flipfit.model.user.User;
+import com.flipfit.flipfit.repository.BookingRepository;
+import com.flipfit.flipfit.repository.CenterRepository;
+import com.flipfit.flipfit.repository.UserRepository;
+import com.flipfit.flipfit.service.BookingService;
+import com.flipfit.flipfit.service.CenterService;
+import com.flipfit.flipfit.service.SlotService;
+import com.flipfit.flipfit.service.UserService;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public class driver {
 
@@ -26,7 +37,7 @@ public class driver {
 
         // Setup Users
         User user1 = new NormalUser("user-id-1", "mayank");
-        User user2 = new NormalUser("user-id-2", "archit");
+        User user2 = new NormalUser("user-id-2", "tka4798");
         userService.addUser(user1);
         userService.addUser(user2);
 
@@ -47,12 +58,41 @@ public class driver {
         Slot slot6 = new NormalSlot("slot-6", times[4]);
 
         // Add Workout Variations to Slots
-        addWorkoutVariationsInSlot(slotService, slot1, WorkoutVariation.WEIGHTS, WorkoutVariation.CARDIO);
-        addWorkoutVariationsInSlot(slotService, slot2, WorkoutVariation.WEIGHTS, WorkoutVariation.CARDIO, WorkoutVariation.SWIMMING, WorkoutVariation.YOGA);
-        addWorkoutVariationsInSlot(slotService, slot3, WorkoutVariation.WEIGHTS, WorkoutVariation.SWIMMING, WorkoutVariation.YOGA);
-        addWorkoutVariationsInSlot(slotService, slot4, WorkoutVariation.WEIGHTS, WorkoutVariation.CARDIO);
-        addWorkoutVariationsInSlot(slotService, slot5, WorkoutVariation.WEIGHTS, WorkoutVariation.CARDIO);
-        addWorkoutVariationsInSlot(slotService, slot6, WorkoutVariation.WEIGHTS, WorkoutVariation.CARDIO);
+        Map<Slot, Map<WorkoutVariation, Integer>> slotVariationData = Map.of(
+                slot1, Map.of(
+                        WorkoutVariation.WEIGHTS, 2,
+                        WorkoutVariation.CARDIO, 1
+                ),
+                slot2, Map.of(
+                        WorkoutVariation.WEIGHTS, 3,
+                        WorkoutVariation.CARDIO, 2,
+                        WorkoutVariation.SWIMMING, 1,
+                        WorkoutVariation.YOGA, 1
+                ),
+                slot3, Map.of(
+                        WorkoutVariation.WEIGHTS, 2,
+                        WorkoutVariation.SWIMMING, 1,
+                        WorkoutVariation.YOGA, 1
+                ),
+                slot4, Map.of(
+                        WorkoutVariation.WEIGHTS, 1,
+                        WorkoutVariation.CARDIO, 1
+                ),
+                slot5, Map.of(
+                        WorkoutVariation.WEIGHTS, 1,
+                        WorkoutVariation.CARDIO, 1
+                ),
+                slot6, Map.of(
+                        WorkoutVariation.WEIGHTS, 1,
+                        WorkoutVariation.CARDIO, 1
+                )
+        );
+
+        slotVariationData.forEach((slot, variationSeats) ->
+                variationSeats.forEach((variation, seats) ->
+                        slotService.addWorkoutVariationInASlot(slot, variation, seats)
+                )
+        );
 
         // Register Slots to Center
         List.of(slot1, slot2, slot3, slot4, slot5, slot6)
@@ -69,12 +109,6 @@ public class driver {
         bookingService.cancelBooking(user1, center1, slot2);
         System.out.println("User1 Bookings after cancel: " + userRepository.getAllBookings(user1).size());
         System.out.println("Cancel - flow completed");
-    }
-
-    private static void addWorkoutVariationsInSlot(SlotService slotService, Slot slot, WorkoutVariation... variations) {
-        for (WorkoutVariation variation : variations) {
-            slotService.addWorkoutVariationInASlot(slot, variation, 1);
-        }
     }
 
     private static void bookAndPrint(BookingService bookingService, UserRepository userRepository, User user, Center center, WorkoutVariation variation, Slot slot) {
