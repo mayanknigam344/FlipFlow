@@ -13,4 +13,8 @@ public abstract class User {
     String userName;
     UserType userType;
     List<Booking> bookings;
+
+    public boolean isVip() {
+        return this.userType == UserType.FK_VIP_USER;
+    }
 }

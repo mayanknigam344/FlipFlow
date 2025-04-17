@@ -24,7 +24,7 @@ public class CenterService {
     public List<WorkoutVariation> getWorkoutVariationsForAGivenCenter(Center center){
         return center.getSlots()
                 .stream()
-                .map(Slot::getWorkoutVariationVsSeatCount)
+                .map(Slot::getWorkoutVariationToSeats)
                 .flatMap(map -> map.keySet().stream())
                 .distinct()
                 .toList();

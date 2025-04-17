@@ -34,83 +34,110 @@ public class BookingService {
     );
 
     public Booking book(User user, Center center, WorkoutVariation workoutVariation, Slot slot) {
-        log.info("Booking flow started");
-        Booking booking;
+        log.info("Booking flow started for User {} Center {} Slot {} and Workout variation {}",user.getUserId(),center.getCenterId(),slot.getSlotId(),workoutVariation);
 
-        // check if user is allowed to do booking or not.
-        log.info("Validating if user with user id{} is allowed to do booking or not",user.getUserId());
-        List<Booking> bookingListForAUserInADay= userRepository.getAllBookingsForUserInADay(user.getUserId(),slot.getSlotDateAndTime());
-        List<Booking> bookingPerCenter = bookingListForAUserInADay.stream()
-                .filter(bookingInCenter -> bookingInCenter.getCenter().getCenterId().equals(center.getCenterId()))
-                .toList();
+        validateUserBookingLimit(user, center, slot);
+        validateSlotAvailability(center, user, slot);
 
-        if(bookingPerCenter.size()>=3){
-            throw new UserBookingMaxLimitReachedForAGivenCenter("User is not allowed to do more than 3 bookings for a given center {}"+  user.getUserId());
-        }
         log.info("Validated the user bookings. Great!! User is allowed to do booking.");
 
-        // User is allowed, so get all the slots for a given center for a given date.
-        // If user is VIP User then it will see both types of slots.
-        // If user is Normal User then it will see only normal slots.
-        List<Slot> slotsInACenterForAGivenDateAndTime = slotService.getSlotsForACenterAndGivenDateAndTime(center,user,slot.getSlotDateAndTime());
+        int seats = slot.getSeatCountForWorkout(workoutVariation);
+        log.info("Seat count for a given workout variation {} and slot {} is {}",workoutVariation,slot.getSlotId(), seats);
 
-        // checking if slot exists or not
-        if(!slotsInACenterForAGivenDateAndTime.contains(slot)) {
-            throw new SlotNotFoundException("Slot not found in the given center");
-        }
+        Booking booking = buildBooking(user, center, workoutVariation, slot);
 
-        // Get the seat count in the slot for a given workout variation
-        int seatsForWorkoutVariation = slotService.getSeatCountInaSlotForAWorkoutVariation(slot,workoutVariation);
-        log.info("Seat count for a given workout variation {} and slot {} is {}",workoutVariation,slot.getSlotId(),seatsForWorkoutVariation);
-
-        // make a booking object, setting bookingID only when booking is successful.
-        // Priority - 1 for VIP, 0 for Normal
-        booking = Booking.builder().bookingDateTime(slot.getSlotDateAndTime()).center(center).workoutVariation(workoutVariation).slot(slot).user(user).priority(user.getUserType().equals(UserType.FK_VIP_USER) ? 1 : 0).build();
-        if(seatsForWorkoutVariation>0){
-            // Updating the seat count for a given workout variation and slot.
-            slot.getWorkoutVariationVsSeatCount().put(workoutVariation, seatsForWorkoutVariation-1);
-
-            String bookingId = generateUserId();
-            booking = booking.toBuilder().bookingId(bookingId).build();
-
-            bookingRepository.addBooking(booking);
-            userRepository.addBookingForUser(user,booking);
-            log.info("Booking is Successful with booking id {} for user {} and added in the bookingList",bookingId,user.getUserId());
+        if(seats>0){
+            confirmBooking(user, booking, workoutVariation, slot, seats);
         }else{
-            // otherwise add the booking in list(based on user type).
             bookingQueue.add(booking);
-            log.info("Added the booking in the waiting queue. Booking details - {}",booking);
+            log.info("Added the booking in the waiting queue. Booking details - {}",booking.getBookingId());
         }
         log.info("Booking flow completed");
         return booking;
     }
 
     public void cancelBooking(User user , Center center, Slot slot){
-        log.info("Cancel flow started");
-        Optional<Booking> booking = userRepository.getBookingForUser(user,center,slot);
-        if(booking.isPresent()){
-            //removing the booking from bookings and user lists
-            bookingRepository.removeBooking(booking.get().getBookingId());
-            userRepository.removeBooking(user, booking.get());
+        log.info("Cancel flow started for user: {} and slot: {}", user.getUserId(), slot.getSlotId());
 
-            // increment seat in case of cancel
-            slotService.incrementSeatCountInCaseOfCancel(booking.get().getSlot(),booking.get().getWorkoutVariation());
-
-            if(bookingQueue.isEmpty()){
-                log.info("Cancel flow completed, also there are no bookings in waiting queue");
-                return;
-            }
-            Booking notBooked = bookingQueue.poll();
-            log.info("Fetching the booking {} and priority {} from waiting queue", notBooked,booking.get().getPriority());
-            book(notBooked.getUser(),notBooked.getCenter(),notBooked.getWorkoutVariation(),notBooked.getSlot());
+        Optional<Booking> bookingOpt = userRepository.getBooking(user, center, slot);
+        if (bookingOpt.isEmpty()) {
+            log.info("No booking found to cancel for user: {}", user.getUserId());
+            return;
         }
-    }
+        Booking canceledBooking = bookingOpt.get();
+        removeBookingAndReleaseSeat(user, canceledBooking);
 
-    private String generateUserId() {
-        return UUID.randomUUID().toString();
+        if (bookingQueue.isEmpty()) {
+            log.info("Cancel flow completed. No bookings in waiting queue.");
+            return;
+        }
+        Booking replacementBooking = findBookingWithSameSlot(canceledBooking, bookingQueue);
+
+        if (replacementBooking == null) {
+            log.info("No matching booking in waiting queue for slot: {}", slot.getSlotId());
+            return;
+        }
+
+        log.info("Promoting booking from waiting queue: {}", replacementBooking);
+        promoteBookingFromQueue(replacementBooking);
     }
 
     public List<Booking> viewUserBooking(String userId, LocalDateTime date){
         return userRepository.getAllBookingsForUserInADay(userId,date);
+    }
+
+    private void validateUserBookingLimit(User user, Center center, Slot slot) {
+        List<Booking> bookings = bookingRepository.getBookingsForUserAtCenterOnDate(user, center, slot);
+        if (bookings.size() >= 3) {
+            throw new UserBookingMaxLimitReachedForAGivenCenter("User has reached max bookings at center: " + user.getUserId());
+        }
+    }
+
+    private void validateSlotAvailability(Center center, User user, Slot slot) {
+        List<Slot> slots = slotService.getSlotsForCenterAtTime(center, user, slot.getSlotDateTime());
+        if (!slots.contains(slot)) {
+            throw new SlotNotFoundException("Given Slot not found at given center.");
+        }
+    }
+    private Booking buildBooking(User user, Center center, WorkoutVariation workoutVariation, Slot slot) {
+        int priority = user.getUserType() == UserType.FK_VIP_USER ? 1 : 0;
+        return Booking.builder()
+                .bookingDateTime(slot.getSlotDateTime())
+                .center(center)
+                .workoutVariation(workoutVariation)
+                .slot(slot)
+                .user(user)
+                .priority(priority)
+                .build();
+    }
+
+    private void confirmBooking(User user, Booking booking, WorkoutVariation workoutVariation, Slot slot, int seats) {
+        slot.decrementSeatForWorkout(workoutVariation);
+
+        String bookingId = UUID.randomUUID().toString();
+        booking = booking.toBuilder().bookingId(bookingId).build();
+
+        bookingRepository.addBooking(booking);
+        userRepository.addBooking(user, booking);
+        log.info("Booking successful with ID {} for user {}", booking.getBookingId(), user.getUserId());
+    }
+
+    private void removeBookingAndReleaseSeat(User user, Booking booking) {
+        bookingRepository.removeBooking(booking.getBookingId());
+        userRepository.removeBooking(user, booking);
+        booking.getSlot().incrementSeatForWorkout(booking.getWorkoutVariation());
+        log.info("Booking {} cancelled and seat released", booking.getBookingId());
+    }
+
+    private Booking findBookingWithSameSlot(Booking canceledBooking, PriorityQueue<Booking> queue) {
+        return queue.stream()
+                .filter(b -> b.getSlot().equals(canceledBooking.getSlot()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    private void promoteBookingFromQueue(Booking booking) {
+        book(booking.getUser(), booking.getCenter(), booking.getWorkoutVariation(), booking.getSlot());
+        bookingQueue.remove(booking);
     }
 }

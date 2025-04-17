@@ -18,43 +18,47 @@ import java.util.Optional;
 @Slf4j
 public class UserRepository {
 
-     HashMap<String, User> users = new HashMap<>();
+     HashMap<String, User> usersById = new HashMap<>();
 
     public User addUser(User user) {
-        if(users.containsKey(user.getUserId())) {
-            throw new UserAlreadyPresentException("User already present");
+        if(usersById.containsKey(user.getUserId())) {
+            throw new UserAlreadyPresentException("User already exists with ID: " + user.getUserId());
         }
-        users.put(user.getUserId(),user);
-        log.info("Added user:{}", user.getUserId());
+        usersById.put(user.getUserId(),user);
+        log.info("Successfully added user with ID: {}", user.getUserId());
         return user;
     }
 
-    public void addBookingForUser(User user, Booking booking){
-        log.info("Booking added for user {} with booking id {}", user.getUserId(),booking.getBookingId());
+    public void addBooking(User user, Booking booking){
+        log.info("Adding booking with ID: {} for user with ID: {}", booking.getBookingId(), user.getUserId());
         user.getBookings().add(booking);
     }
 
-    public Optional<Booking> getBookingForUser(User user, Center center, Slot slot){
-        return user.getBookings()
-                .stream()
-                .filter(booking -> booking.getCenter().equals(center))
-                .filter(booking -> booking.getSlot().getSlotId().equals(slot.getSlotId()))
-                .filter(booking-> booking.getSlot().getSlotDateAndTime().equals(slot.getSlotDateAndTime()))
+    public void removeBooking(User user, Booking booking){
+        List<Booking> bookings = user.getBookings();
+        if (bookings.remove(booking)) {
+            log.info("Booking with ID: {} removed for user with ID: {}", booking.getBookingId(), user.getUserId());
+        } else {
+            log.warn("Booking with ID: {} not found for user with ID: {}", booking.getBookingId(), user.getUserId());
+        }
+    }
+
+    public Optional<Booking> getBooking(User user, Center center, Slot slot){
+        return user.getBookings().stream()
+                .filter(booking -> booking.getCenter().equals(center) &&
+                        booking.getSlot().equals(slot) &&
+                        booking.getSlot().getSlotDateTime().equals(slot.getSlotDateTime()))
                 .findFirst();
     }
 
     public List<Booking> getAllBookingsForUserInADay(String userId, LocalDateTime dateTime){
-        User user = users.get(userId);
+        User user = usersById.get(userId);
         return user.getBookings()
                 .stream()
                 .filter(booking -> booking.getBookingDateTime().toLocalDate().equals(dateTime.toLocalDate()))
                 .toList();
     }
 
-    public void removeBooking(User user, Booking booking){
-        List<Booking> bookings = user.getBookings();
-        bookings.remove(booking);
-    }
 
     public List<Booking> getAllBookings(User user){
         return user.getBookings();

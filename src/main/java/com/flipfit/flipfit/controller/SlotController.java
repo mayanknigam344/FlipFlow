@@ -18,6 +18,6 @@ public class SlotController {
     }
 
     public void addWorkoutVariationsForASlot(Slot slot, WorkoutVariation workoutVariation, int seats){
-        slotService.addWorkoutVariationInASlot(slot,workoutVariation,seats);
+        slotService.addWorkoutVariationToSlot(slot,workoutVariation,seats);
     }
 }

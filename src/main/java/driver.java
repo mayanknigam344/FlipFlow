@@ -1,10 +1,10 @@
-import com.flipfit.flipfit.model.Booking;
 import com.flipfit.flipfit.model.Center;
 import com.flipfit.flipfit.model.WorkoutVariation;
 import com.flipfit.flipfit.model.slot.NormalSlot;
 import com.flipfit.flipfit.model.slot.PremiumSlot;
 import com.flipfit.flipfit.model.slot.Slot;
 import com.flipfit.flipfit.model.user.NormalUser;
+import com.flipfit.flipfit.model.user.PremiumUser;
 import com.flipfit.flipfit.model.user.User;
 import com.flipfit.flipfit.repository.BookingRepository;
 import com.flipfit.flipfit.repository.CenterRepository;
@@ -38,8 +38,10 @@ public class driver {
         // Setup Users
         User user1 = new NormalUser("user-id-1", "mayank");
         User user2 = new NormalUser("user-id-2", "tka4798");
+        User user3 = new PremiumUser("user-id-3","tka");
         userService.addUser(user1);
         userService.addUser(user2);
+        userService.addUser(user3);
 
         // Setup Slots
         LocalDateTime[] times = {
@@ -60,7 +62,7 @@ public class driver {
         // Add Workout Variations to Slots
         Map<Slot, Map<WorkoutVariation, Integer>> slotVariationData = Map.of(
                 slot1, Map.of(
-                        WorkoutVariation.WEIGHTS, 2,
+                        WorkoutVariation.WEIGHTS, 1,
                         WorkoutVariation.CARDIO, 1
                 ),
                 slot2, Map.of(
@@ -90,7 +92,7 @@ public class driver {
 
         slotVariationData.forEach((slot, variationSeats) ->
                 variationSeats.forEach((variation, seats) ->
-                        slotService.addWorkoutVariationInASlot(slot, variation, seats)
+                        slotService.addWorkoutVariationToSlot(slot, variation, seats)
                 )
         );
 
@@ -101,24 +103,15 @@ public class driver {
         System.out.println("Slots in center: " + centerRepository.getSlotsInCenter(center1).size());
 
         // Booking Flow
-        bookAndPrint(bookingService, userRepository, user1, center1, WorkoutVariation.WEIGHTS, slot2);
-        bookAndPrint(bookingService, userRepository, user2, center1, WorkoutVariation.WEIGHTS, slot2);
+        book(bookingService, userRepository, user3, center1, WorkoutVariation.WEIGHTS, slot1);
+        book(bookingService, userRepository, user1, center1, WorkoutVariation.WEIGHTS, slot2);
+        book(bookingService, userRepository, user2, center1, WorkoutVariation.WEIGHTS, slot2);
 
         // Cancel Booking
-        System.out.println("Cancel - flow started");
         bookingService.cancelBooking(user1, center1, slot2);
-        System.out.println("User1 Bookings after cancel: " + userRepository.getAllBookings(user1).size());
-        System.out.println("Cancel - flow completed");
     }
 
-    private static void bookAndPrint(BookingService bookingService, UserRepository userRepository, User user, Center center, WorkoutVariation variation, Slot slot) {
-        System.out.println("Booking - flow started for user: " + user.getUserId());
-        Booking booking = bookingService.book(user, center, variation, slot);
-        if (booking != null) {
-            System.out.println("Booking successful, ID: " + booking.getBookingId());
-        } else {
-            System.out.println("Booking failed or added to waiting queue");
-        }
-        System.out.println("Total bookings for user: " + userRepository.getAllBookings(user).size());
+    private static void book(BookingService bookingService, UserRepository userRepository, User user, Center center, WorkoutVariation variation, Slot slot) {
+        bookingService.book(user, center, variation, slot);
     }
 }
