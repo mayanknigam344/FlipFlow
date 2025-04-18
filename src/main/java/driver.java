@@ -1,5 +1,6 @@
 import com.flipfit.flipfit.model.Center;
 import com.flipfit.flipfit.model.WorkoutVariation;
+import com.flipfit.flipfit.model.booking.Booking;
 import com.flipfit.flipfit.model.slot.NormalSlot;
 import com.flipfit.flipfit.model.slot.PremiumSlot;
 import com.flipfit.flipfit.model.slot.Slot;
@@ -109,6 +110,12 @@ public class driver {
 
         // Cancel Booking
         bookingService.cancelBooking(user1, center1, slot2);
+
+        // view user booking
+        List<Booking> getBookings = bookingService.viewUserBooking(user2.getUserId(),LocalDateTime.now());
+        for (Booking booking : getBookings) {
+            System.out.println(booking);
+        }
     }
 
     private static void book(BookingService bookingService, UserRepository userRepository, User user, Center center, WorkoutVariation variation, Slot slot) {

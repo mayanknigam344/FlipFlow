@@ -1,6 +1,6 @@
 package com.flipfit.flipfit.controller;
 
-import com.flipfit.flipfit.model.Booking;
+import com.flipfit.flipfit.model.booking.Booking;
 import com.flipfit.flipfit.model.Center;
 import com.flipfit.flipfit.model.WorkoutVariation;
 import com.flipfit.flipfit.model.slot.Slot;

@@ -1,6 +1,6 @@
 package com.flipfit.flipfit.service;
 
-import com.flipfit.flipfit.model.Booking;
+import com.flipfit.flipfit.model.booking.Booking;
 import com.flipfit.flipfit.model.user.User;
 import com.flipfit.flipfit.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,8 +16,8 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public User addUser(User user){
-        return userRepository.addUser(user);
+    public void addUser(User user){
+        userRepository.addUser(user);
     }
 
     public List<Booking> getAllBookingsForAUser(User user){

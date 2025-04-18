@@ -1,9 +1,10 @@
 package com.flipfit.flipfit.model.user;
 
-import com.flipfit.flipfit.model.Booking;
+import com.flipfit.flipfit.model.booking.Booking;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter

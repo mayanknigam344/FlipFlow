@@ -1,6 +1,6 @@
 package com.flipfit.flipfit.controller;
 
-import com.flipfit.flipfit.model.Booking;
+import com.flipfit.flipfit.model.booking.Booking;
 import com.flipfit.flipfit.model.user.User;
 import com.flipfit.flipfit.service.UserService;
 import lombok.RequiredArgsConstructor;

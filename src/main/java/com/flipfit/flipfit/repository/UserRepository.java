@@ -2,7 +2,7 @@ package com.flipfit.flipfit.repository;
 
 
 import com.flipfit.flipfit.exception.UserAlreadyPresentException;
-import com.flipfit.flipfit.model.Booking;
+import com.flipfit.flipfit.model.booking.Booking;
 import com.flipfit.flipfit.model.Center;
 import com.flipfit.flipfit.model.slot.Slot;
 import com.flipfit.flipfit.model.user.User;
@@ -20,18 +20,26 @@ public class UserRepository {
 
      HashMap<String, User> usersById = new HashMap<>();
 
-    public User addUser(User user) {
+    public void addUser(User user) {
         if(usersById.containsKey(user.getUserId())) {
             throw new UserAlreadyPresentException("User already exists with ID: " + user.getUserId());
         }
         usersById.put(user.getUserId(),user);
         log.info("Successfully added user with ID: {}", user.getUserId());
-        return user;
+    }
+
+    public User getUserById(String userId){
+        return usersById.get(userId);
     }
 
     public void addBooking(User user, Booking booking){
         log.info("Adding booking with ID: {} for user with ID: {}", booking.getBookingId(), user.getUserId());
         user.getBookings().add(booking);
+    }
+
+    public void replaceBooking(User user, Booking booking, Booking updatedBooking){
+        removeBooking(user, booking);
+        addBooking(user,updatedBooking);
     }
 
     public void removeBooking(User user, Booking booking){
@@ -52,15 +60,10 @@ public class UserRepository {
     }
 
     public List<Booking> getAllBookingsForUserInADay(String userId, LocalDateTime dateTime){
-        User user = usersById.get(userId);
+        User user = getUserById(userId);
         return user.getBookings()
                 .stream()
                 .filter(booking -> booking.getBookingDateTime().toLocalDate().equals(dateTime.toLocalDate()))
                 .toList();
-    }
-
-
-    public List<Booking> getAllBookings(User user){
-        return user.getBookings();
     }
 }

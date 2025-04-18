@@ -1,7 +1,8 @@
 package com.flipfit.flipfit.repository;
 
-import com.flipfit.flipfit.model.Booking;
 import com.flipfit.flipfit.model.Center;
+import com.flipfit.flipfit.model.booking.Booking;
+import com.flipfit.flipfit.model.booking.BookingStatus;
 import com.flipfit.flipfit.model.slot.Slot;
 import com.flipfit.flipfit.model.user.User;
 import org.springframework.stereotype.Repository;
@@ -29,6 +30,12 @@ public class BookingRepository {
         return bookings.get(bookingId);
     }
 
+    public Booking updateBookingStatus(Booking booking, BookingStatus status){
+         Booking updatedBooking =  booking.toBuilder().status(status).build();
+         bookings.put(booking.getBookingId(),updatedBooking);
+         return updatedBooking;
+    }
+
     public List<Booking> getBookingsForUserAtCenterOnDate(User user, Center center, Slot slot) {
         List<Booking> bookings = getBookingsForUserOnDate(user,slot.getSlotDateTime());
         return bookings.stream()
@@ -40,7 +47,8 @@ public class BookingRepository {
         return user.getBookings()
                 .stream()
                 .filter(booking -> booking.getUser().getUserId().equals(user.getUserId()))
-                .filter(b -> b.getBookingDateTime().toLocalDate().equals(date.toLocalDate()))
+                .filter(booking -> booking.getBookingDateTime().toLocalDate().equals(date.toLocalDate()))
+                .filter(booking -> booking.getStatus().equals(BookingStatus.CONFIRMED))
                 .toList();
     }
 }

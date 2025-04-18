@@ -2,9 +2,10 @@ package com.flipfit.flipfit.service;
 
 import com.flipfit.flipfit.exception.SlotNotFoundException;
 import com.flipfit.flipfit.exception.UserBookingMaxLimitReachedForAGivenCenter;
-import com.flipfit.flipfit.model.Booking;
+import com.flipfit.flipfit.model.booking.Booking;
 import com.flipfit.flipfit.model.Center;
 import com.flipfit.flipfit.model.WorkoutVariation;
+import com.flipfit.flipfit.model.booking.BookingStatus;
 import com.flipfit.flipfit.model.slot.Slot;
 import com.flipfit.flipfit.model.user.User;
 import com.flipfit.flipfit.model.user.UserType;
@@ -47,8 +48,9 @@ public class BookingService {
         Booking booking = buildBooking(user, center, workoutVariation, slot);
 
         if(seats>0){
-            confirmBooking(user, booking, workoutVariation, slot, seats);
+            booking = confirmBooking(user, booking, workoutVariation, slot, seats);
         }else{
+            booking = bookingRepository.updateBookingStatus(booking,BookingStatus.WAITING);
             bookingQueue.add(booking);
             log.info("Added the booking in the waiting queue. Booking details - {}",booking.getBookingId());
         }
@@ -65,7 +67,7 @@ public class BookingService {
             return;
         }
         Booking canceledBooking = bookingOpt.get();
-        removeBookingAndReleaseSeat(user, canceledBooking);
+        updateBookingAndReleaseSeat(user, canceledBooking);
 
         if (bookingQueue.isEmpty()) {
             log.info("Cancel flow completed. No bookings in waiting queue.");
@@ -83,6 +85,8 @@ public class BookingService {
     }
 
     public List<Booking> viewUserBooking(String userId, LocalDateTime date){
+        markBookingsCompleted(userId);
+        log.info("Marked past bookings as 'COMPLETED' for user {} (excluding those already 'CANCELED')", userId);
         return userRepository.getAllBookingsForUserInADay(userId,date);
     }
 
@@ -111,22 +115,25 @@ public class BookingService {
                 .build();
     }
 
-    private void confirmBooking(User user, Booking booking, WorkoutVariation workoutVariation, Slot slot, int seats) {
+    private Booking confirmBooking(User user, Booking booking, WorkoutVariation workoutVariation, Slot slot, int seats) {
         slot.decrementSeatForWorkout(workoutVariation);
 
         String bookingId = UUID.randomUUID().toString();
         booking = booking.toBuilder().bookingId(bookingId).build();
 
-        bookingRepository.addBooking(booking);
-        userRepository.addBooking(user, booking);
-        log.info("Booking successful with ID {} for user {}", booking.getBookingId(), user.getUserId());
+        Booking updatedBooking = bookingRepository.updateBookingStatus(booking,BookingStatus.CONFIRMED);
+        bookingRepository.addBooking(updatedBooking);
+        userRepository.addBooking(user, updatedBooking);
+
+        log.info("Booking successful with ID {} for user {}", updatedBooking.getBookingId(), user.getUserId());
+        return updatedBooking;
     }
 
-    private void removeBookingAndReleaseSeat(User user, Booking booking) {
-        bookingRepository.removeBooking(booking.getBookingId());
-        userRepository.removeBooking(user, booking);
-        booking.getSlot().incrementSeatForWorkout(booking.getWorkoutVariation());
-        log.info("Booking {} cancelled and seat released", booking.getBookingId());
+    private void updateBookingAndReleaseSeat(User user, Booking booking) {
+        Booking updatedBooking = bookingRepository.updateBookingStatus(booking,BookingStatus.CANCELLED);
+        userRepository.replaceBooking(user,booking,updatedBooking);
+        updatedBooking.getSlot().incrementSeatForWorkout(updatedBooking.getWorkoutVariation());
+        log.info("Booking {} cancelled and seat released", updatedBooking.getBookingId());
     }
 
     private Booking findBookingWithSameSlot(Booking canceledBooking, PriorityQueue<Booking> queue) {
@@ -139,5 +146,19 @@ public class BookingService {
     private void promoteBookingFromQueue(Booking booking) {
         book(booking.getUser(), booking.getCenter(), booking.getWorkoutVariation(), booking.getSlot());
         bookingQueue.remove(booking);
+    }
+
+    private void markBookingsCompleted(String userId){
+        User user = userRepository.getUserById(userId);
+        List<Booking> updatedBookings = user.getBookings().stream()
+                .map(booking -> {
+                    if (booking.getStatus() == BookingStatus.CONFIRMED && booking.getBookingDateTime().isBefore(LocalDateTime.now())) {
+                        log.info("Changing status of booking with ID: {} from {} to COMPLETED", booking.getBookingId(), booking.getStatus());
+                        return booking.toBuilder().status(BookingStatus.COMPLETED).build();
+                    }
+                    return booking;
+                }).toList();
+
+        user.setBookings(updatedBookings);
     }
 }
