@@ -8,11 +8,11 @@
         <version>3.4.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.flipfit</groupId>
-    <artifactId>FlipFit</artifactId>
+    <groupId>com.flipflow</groupId>
+    <artifactId>FlipFlow</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>FlipFit</name>
-    <description>FlipFit</description>
+    <name>FlipFlow</name>
+    <description>FlipFlow</description>
     <url/>
     <licenses>
         <license/>
@@ -39,10 +39,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
